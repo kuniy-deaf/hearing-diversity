@@ -55,6 +55,14 @@ const audiogramTypes = {
   }
 };
 
+const hearingLevels = {
+  normal: { label: "健聴", targetAverage: 20 },
+  mild: { label: "軽度難聴", targetAverage: 35 },
+  moderate: { label: "中度難聴", targetAverage: 55 },
+  severe: { label: "高度難聴", targetAverage: 80 },
+  profound: { label: "重度難聴", targetAverage: 110 }
+};
+
 const els = {
   audioFile: document.getElementById("audioFile"),
   loadSampleBtn: document.getElementById("loadSampleBtn"),
@@ -66,8 +74,6 @@ const els = {
   typeSummary: document.getElementById("typeSummary"),
   typeDescription: document.getElementById("typeDescription"),
   audiogramSvg: document.getElementById("audiogramSvg"),
-  volume: document.getElementById("volume"),
-  volumeValue: document.getElementById("volumeValue"),
   clarity: document.getElementById("clarity"),
   clarityValue: document.getElementById("clarityValue"),
   currentSettings: document.getElementById("currentSettings")
@@ -97,9 +103,11 @@ function init() {
     updateSettings();
   });
 
-  els.volume.addEventListener("input", () => {
-    updateSliderLabels();
-    updateSettings();
+  document.querySelectorAll('input[name="hearingLevel"]').forEach((input) => {
+    input.addEventListener("change", () => {
+      updateAudiogramInfo();
+      updateSettings();
+    });
   });
 
   els.clarity.addEventListener("input", () => {
@@ -168,25 +176,73 @@ function enablePlayback() {
 }
 
 function updateSliderLabels() {
-  els.volumeValue.textContent = els.volume.value;
   els.clarityValue.textContent = els.clarity.value;
 }
 
 function updateSettings() {
   const type = audiogramTypes[els.audiogramType.value];
+  const level = getSelectedHearingLevel();
+  const adjustedPoints = getAdjustedAudiogramPoints(type.points, level.targetAverage);
+  const average = getFourFrequencyAverage(adjustedPoints);
+
   els.currentSettings.textContent =
     `オージオグラムタイプ：${type.name}\n` +
-    `音量：${els.volume.value}%\n` +
+    `聴力レベル：${level.label}（四分法平均 約${average.toFixed(1)}dB）\n` +
     `ことばの明瞭度：${els.clarity.value}%\n\n` +
     `あなたが体験したのは、数ある聞こえ方のひとつです。\n同じ難聴者でも、聞こえ方は一人ひとり異なります。\nこの体験が、さまざまな聞こえ方を知るきっかけになれば幸いです。`;
 }
 
 function updateAudiogramInfo() {
   const type = audiogramTypes[els.audiogramType.value];
-  els.typeName.textContent = type.name;
-  els.typeSummary.textContent = type.summary;
+  const level = getSelectedHearingLevel();
+  const adjustedPoints = getAdjustedAudiogramPoints(type.points, level.targetAverage);
+  const average = getFourFrequencyAverage(adjustedPoints);
+
+  els.typeName.textContent = `${type.name} / ${level.label}`;
+  els.typeSummary.textContent = `${type.summary} 四分法平均は約${average.toFixed(1)}dBです。`;
   els.typeDescription.textContent = type.description;
-  drawAudiogram(type);
+  drawAudiogram({ ...type, points: adjustedPoints });
+}
+
+function getSelectedHearingLevel() {
+  const selected = document.querySelector('input[name="hearingLevel"]:checked')?.value || "moderate";
+  return hearingLevels[selected];
+}
+
+function getDb(points, frequency) {
+  const point = points.find(([freq]) => freq === frequency);
+  if (!point) {
+    throw new Error(`Audiogram point ${frequency}Hz is missing.`);
+  }
+  return point[1];
+}
+
+function getFourFrequencyAverage(points) {
+  const db500 = getDb(points, 500);
+  const db1000 = getDb(points, 1000);
+  const db2000 = getDb(points, 2000);
+  return (db500 + db1000 * 2 + db2000) / 4;
+}
+
+function getAdjustedAudiogramPoints(basePoints, targetAverage) {
+  const currentAverage = getFourFrequencyAverage(basePoints);
+  const shift = targetAverage - currentAverage;
+
+  return basePoints.map(([freq, db]) => [
+    freq,
+    clampDb(db + shift)
+  ]);
+}
+
+function clampDb(db) {
+  return Math.min(120, Math.max(-10, db));
+}
+
+function hearingLevelToGain(targetAverage) {
+  // Compressed for listening through ordinary devices.
+  // A direct dB conversion would make severe/profound levels almost silent.
+  const gainDb = -targetAverage * 0.42;
+  return Math.pow(10, gainDb / 20);
 }
 
 function drawAudiogram(type) {
@@ -202,7 +258,7 @@ function drawAudiogram(type) {
 
   const freqs = [125, 250, 500, 1000, 2000, 4000, 8000];
   const dbMin = -10;
-  const dbMax = 100;
+  const dbMax = 120;
 
   const xForFreq = (freq) => {
     // Audiograms use octave-like frequency spacing.
@@ -219,7 +275,7 @@ function drawAudiogram(type) {
   appendRect(svg, 0, 0, width, height, "#fff");
 
   // Grid
-  for (const db of [-10, 0, 20, 40, 60, 80, 100]) {
+  for (const db of [-10, 0, 20, 40, 60, 80, 100, 120]) {
     const y = yForDb(db);
     appendLine(svg, margin.left, y, width - margin.right, y, "#e5e7eb", 1);
     appendText(svg, margin.left - 12, y + 4, String(db), "end", "svg-label");
@@ -416,7 +472,8 @@ async function playAudio({ processed }) {
   }
 
   const type = audiogramTypes[els.audiogramType.value];
-  const volume = Number(els.volume.value) / 100;
+  const level = getSelectedHearingLevel();
+  const volume = hearingLevelToGain(level.targetAverage);
   const clarity = Number(els.clarity.value);
 
   const audiogramFilter = createAudiogramFilter(audioContext, type.filter);

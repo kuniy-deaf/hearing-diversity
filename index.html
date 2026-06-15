@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>Explore Hearing Diversity</title>
+  <title>聞こえ方の違いを体験する</title>
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
       <p class="eyebrow">Hearing Diversity Simulator</p>
       <h1>聞こえ方の違いを体験する</h1>
       <p class="lead">
-        これから体験するのは、数ある聞こえ方のひとつです。<br>
+        あなたが体験するのは、数ある聞こえ方のひとつです。
         同じ難聴者でも、聞こえ方は一人ひとり異なります。
       </p>
     </div>
@@ -62,15 +62,44 @@
         </p>
       </div>
 
-      <div class="field">
-        <label for="volume">
-          音量 <span id="volumeValue">100</span>%
-        </label>
-        <input id="volume" type="range" min="0" max="120" value="100">
+      <fieldset class="field hearing-level-field">
+        <legend>聴力レベル</legend>
         <p class="help">
-          全体の音量を変えます。難聴は「音量が小さいだけ」ではありません。
+          四分法平均（500Hz + 1000Hz×2 + 2000Hz）÷4 が、選んだ代表値に近づくようにグラフを調整します。
         </p>
-      </div>
+
+        <div class="hearing-level-options">
+          <label class="radio-card">
+            <input type="radio" name="hearingLevel" value="normal">
+            <span>健聴</span>
+            <small>20dB相当</small>
+          </label>
+
+          <label class="radio-card">
+            <input type="radio" name="hearingLevel" value="mild">
+            <span>軽度難聴</span>
+            <small>35dB相当</small>
+          </label>
+
+          <label class="radio-card">
+            <input type="radio" name="hearingLevel" value="moderate" checked>
+            <span>中度難聴</span>
+            <small>55dB相当</small>
+          </label>
+
+          <label class="radio-card">
+            <input type="radio" name="hearingLevel" value="severe">
+            <span>高度難聴</span>
+            <small>80dB相当</small>
+          </label>
+
+          <label class="radio-card">
+            <input type="radio" name="hearingLevel" value="profound">
+            <span>重度難聴</span>
+            <small>110dB相当</small>
+          </label>
+        </div>
+      </fieldset>
 
       <div class="field">
         <label for="clarity">

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>聞こえ方の違いを体験する</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Hearing Diversity Simulator</p>
+      <h1>聞こえ方の違いを体験する</h1>
+      <p class="lead">
+        あなたが体験するのは、数ある聞こえ方のひとつです。
+        同じ難聴者でも、聞こえ方は一人ひとり異なります。
+      </p>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel">
+      <h2>1. 音声を選ぶ</h2>
+
+      <div class="field">
+        <label for="audioFile">音声ファイルを選択</label>
+        <input id="audioFile" type="file" accept="audio/*">
+        <p class="help">
+          選択した音声ファイルはサーバーには送信されません。このブラウザ内でのみ処理されます。
+        </p>
+      </div>
+
+      <div class="button-row">
+        <button id="loadSampleBtn" type="button">サンプル音声を使う</button>
+        <button id="playOriginalBtn" type="button" disabled>元の音を再生</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>2. 聞こえ方を設定する</h2>
+
+      <div class="field">
+        <label for="audiogramType">オージオグラムタイプ</label>
+        <select id="audiogramType"></select>
+      </div>
+
+      <div class="audiogram-card">
+        <div class="audiogram-header">
+          <h3 id="typeName">-</h3>
+          <p id="typeSummary">タイプを選択してください。</p>
+        </div>
+
+        <svg id="audiogramSvg" viewBox="0 0 640 360" role="img" aria-labelledby="audiogramTitle audiogramDesc">
+          <title id="audiogramTitle">オージオグラム図</title>
+          <desc id="audiogramDesc">選択した聞こえ方のサンプル図です。</desc>
+        </svg>
+
+        <p id="typeDescription" class="description"></p>
+        <p class="speech-banana-note">
+          ※ スピーチバナナは英語音声を基準とした概念図です。実際の聞こえ方を再現するものではなく、イメージしやすいように簡略化しています。
+        </p>
+      </div>
+
+      <div class="field">
+        <label for="volume">
+          音量 <span id="volumeValue">100</span>%
+        </label>
+        <input id="volume" type="range" min="0" max="120" value="100">
+        <p class="help">
+          全体の音量を変えます。難聴は「音量が小さいだけ」ではありません。
+        </p>
+      </div>
+
+      <div class="field">
+        <label for="clarity">
+          ことばの明瞭度 <span id="clarityValue">100</span>%
+        </label>
+        <input id="clarity" type="range" min="10" max="100" value="100">
+        <p class="help">
+          医学的な語音明瞭度そのものではなく、ことばの輪郭が失われる感じを疑似的に表します。
+        </p>
+      </div>
+
+      <div class="button-row">
+        <button id="playProcessedBtn" type="button" disabled>変化した音を再生</button>
+        <button id="stopBtn" type="button" disabled>停止</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>3. 体験した設定</h2>
+      <div id="currentSettings" class="settings-box"></div>
+
+      <div class="notice">
+        <h3>この体験の目的</h3>
+        <p>
+          このアプリは、さまざまな聞こえ方を体験するためのサンプルです。
+          「聴力レベル」「オージオグラム」「ことばの明瞭度」が別の要素であり、
+          人によって聞こえ方が大きく違うことを知るための疑似体験です。
+        </p>
+      </div>
+
+      <div class="notice">
+        <h3>伝えたいこと</h3>
+        <p>
+          あなたが体験したのは、数ある聞こえ方のひとつです。
+          同じ難聴者でも、聞こえ方は一人ひとり異なります。
+          この体験が、さまざまな聞こえ方を知るきっかけになれば幸いです。
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      Educational prototype. Audio processing runs locally in your browser.
+    </p>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>

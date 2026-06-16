@@ -489,16 +489,23 @@ async function playAudio({ processed }) {
 
   const audiogramFilter = createAudiogramFilter(audioContext, type.filter);
   const clarityFilter = createClarityFilter(audioContext, clarity);
+  const consonantReduction = createConsonantReductionFilter(audioContext, clarity);
   const compressor = createCompressor(audioContext);
   const gain = audioContext.createGain();
   gain.gain.value = volume;
 
+  const smear = createTimeSmearDelay(audioContext, clarity);
+
   source
     .connect(audiogramFilter)
     .connect(clarityFilter)
+    .connect(consonantReduction)
     .connect(compressor)
     .connect(gain)
     .connect(audioContext.destination);
+
+  // A delayed copy makes fast consonant edges less distinct.
+  compressor.connect(smear.delay).connect(smear.gain).connect(gain);
 
   const noiseBundle = createNoise(audioContext, clarity);
   noiseBundle.noise.connect(noiseBundle.gain).connect(audioContext.destination);
@@ -542,12 +549,40 @@ function createClarityFilter(context, clarity) {
   const normalized = clarity / 100;
   const filter = context.createBiquadFilter();
 
-  // Lower clarity removes more high-frequency speech cues.
+  // Stronger clarity simulation:
+  // Lower clarity removes more high-frequency speech cues that carry consonants.
+  // This is not a reproduction of any specific person's hearing.
   filter.type = "lowpass";
-  filter.frequency.value = 850 + (7600 * normalized);
-  filter.Q.value = 0.8;
+  filter.frequency.value = 500 + (7200 * Math.pow(normalized, 2.2));
+  filter.Q.value = 0.45 + normalized * 0.35;
 
   return filter;
+}
+
+function createConsonantReductionFilter(context, clarity) {
+  const normalized = clarity / 100;
+  const filter = context.createBiquadFilter();
+
+  // Reduces a broad consonant-heavy band around 3kHz.
+  // Lower clarity = deeper cut.
+  filter.type = "peaking";
+  filter.frequency.value = 3200;
+  filter.Q.value = 0.9;
+  filter.gain.value = -2 - (1 - normalized) * 32;
+
+  return filter;
+}
+
+function createTimeSmearDelay(context, clarity) {
+  const normalized = clarity / 100;
+  const delay = context.createDelay(0.08);
+  const gain = context.createGain();
+
+  // Adds a small delayed copy to blur fast speech edges.
+  delay.delayTime.value = 0.008 + (1 - normalized) * 0.045;
+  gain.gain.value = (1 - normalized) * 0.23;
+
+  return { delay, gain };
 }
 
 function createCompressor(context) {
@@ -575,7 +610,7 @@ function createNoise(context, clarity) {
   noise.loop = true;
 
   const gain = context.createGain();
-  gain.gain.value = ((100 - clarity) / 100) * 0.06;
+  gain.gain.value = Math.pow((100 - clarity) / 100, 1.2) * 0.18;
 
   return { noise, gain };
 }

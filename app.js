@@ -57,11 +57,11 @@ const hearingLevels = {
 const sampleVoices = {
   female: {
     label: "女性の声",
-    url: "./samples/female.wav"
+    url: "./samples/female.mp3"
   },
   male: {
     label: "男性の声",
-    url: "./samples/male.wav"
+    url: "./samples/male.mp3"
   }
 };
 

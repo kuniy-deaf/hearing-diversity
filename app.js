@@ -1,13 +1,4 @@
 const audiogramTypes = {
-  normal: {
-    name: "正常聴力",
-    summary: "各周波数が概ねよく聞こえる状態です。",
-    description: "比較用の設定です。実際の聞こえ方は環境や音源によっても変わります。",
-    points: [
-      [125, 10], [250, 10], [500, 10], [1000, 10], [2000, 10], [4000, 10], [8000, 10]
-    ],
-    filter: { kind: "normal" }
-  },
   highSlope: {
     name: "高音漸傾型",
     summary: "高い音になるほど徐々に聞こえにくくなるタイプです。",
@@ -63,9 +54,21 @@ const hearingLevels = {
   profound: { label: "重度難聴", targetAverage: 110 }
 };
 
+const sampleVoices = {
+  female: {
+    label: "女性の声",
+    url: "./samples/female.wav"
+  },
+  male: {
+    label: "男性の声",
+    url: "./samples/male.wav"
+  }
+};
+
 const els = {
   audioFile: document.getElementById("audioFile"),
-  loadSampleBtn: document.getElementById("loadSampleBtn"),
+  loadFemaleSampleBtn: document.getElementById("loadFemaleSampleBtn"),
+  loadMaleSampleBtn: document.getElementById("loadMaleSampleBtn"),
   playOriginalBtn: document.getElementById("playOriginalBtn"),
   playProcessedBtn: document.getElementById("playProcessedBtn"),
   stopBtn: document.getElementById("stopBtn"),
@@ -117,7 +120,8 @@ function init() {
   });
 
   els.audioFile.addEventListener("change", handleFile);
-  els.loadSampleBtn.addEventListener("click", loadSampleTone);
+  els.loadFemaleSampleBtn.addEventListener("click", () => loadSampleVoice("female"));
+  els.loadMaleSampleBtn.addEventListener("click", () => loadSampleVoice("male"));
   els.playOriginalBtn.addEventListener("click", () => playAudio({ processed: false }));
   els.playProcessedBtn.addEventListener("click", () => playAudio({ processed: true }));
   els.stopBtn.addEventListener("click", stopAll);
@@ -144,30 +148,26 @@ async function handleFile(event) {
   enablePlayback(`音声ファイル「${file.name}」を読み込みました。`);
 }
 
-async function loadSampleTone() {
+async function loadSampleVoice(key) {
+  const sample = sampleVoices[key];
+  if (!sample) return;
+
   await ensureAudioContext();
 
-  // Browser-only sample voice-like tone.
-  // This is not speech, but lets the UI work before a user chooses a file.
-  const duration = 4;
-  const sampleRate = audioContext.sampleRate;
-  const buffer = audioContext.createBuffer(1, sampleRate * duration, sampleRate);
-  const data = buffer.getChannelData(0);
+  try {
+    const response = await fetch(sample.url);
+    if (!response.ok) {
+      throw new Error(`${sample.url} を読み込めませんでした。`);
+    }
 
-  const syllableFreqs = [220, 330, 440, 660, 330, 550, 440, 280];
-  for (let i = 0; i < data.length; i++) {
-    const t = i / sampleRate;
-    const idx = Math.floor((t / duration) * syllableFreqs.length);
-    const base = syllableFreqs[Math.min(idx, syllableFreqs.length - 1)];
-    const envelope = 0.5 + 0.5 * Math.sin(2 * Math.PI * 3 * t);
-    data[i] =
-      0.18 * envelope * Math.sin(2 * Math.PI * base * t) +
-      0.08 * envelope * Math.sin(2 * Math.PI * base * 2.1 * t) +
-      0.04 * envelope * Math.sin(2 * Math.PI * base * 3.7 * t);
+    const arrayBuffer = await response.arrayBuffer();
+    audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+    enablePlayback(`${sample.label}を読み込みました。`);
+  } catch (error) {
+    console.error(error);
+    alert(`サンプル音声を読み込めませんでした。\n${sample.url} がGitHub上にあるか確認してください。`);
   }
-
-  audioBuffer = buffer;
-  enablePlayback("サンプル音を読み込みました。");
 }
 
 function enablePlayback(label = "音源の準備ができました。") {

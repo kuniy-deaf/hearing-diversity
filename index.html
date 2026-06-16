@@ -19,16 +19,25 @@
   <main class="layout">
     <section class="panel step-panel">
       <div class="step-heading"><span class="step-number">STEP 1</span><h2>音源を選ぶ</h2></div>
-      <p class="section-lead">まずは、サンプル音を使うか、自分の音声ファイルを選んでください。</p>
+      <p class="section-lead">まずは、サンプル音声を使うか、自分の音声ファイルを選んでください。</p>
 
       <div class="source-choice-grid">
-        <button id="loadSampleBtn" type="button" class="choice-button">
-          <span>サンプル音を使う</span>
-          <small>ファイルを用意せずに試せます</small>
-        </button>
+        <div class="sample-card">
+          <p class="source-label">サンプル音声を使う</p>
+          <div class="button-row">
+            <button id="loadFemaleSampleBtn" type="button" class="choice-button">
+              <span>女性の声</span>
+              <small>samples/female.wav を読み込みます</small>
+            </button>
+            <button id="loadMaleSampleBtn" type="button" class="choice-button">
+              <span>男性の声</span>
+              <small>samples/male.wav を読み込みます</small>
+            </button>
+          </div>
+        </div>
 
         <div class="upload-card">
-          <label for="audioFile">音声ファイルを選ぶ</label>
+          <label for="audioFile">自分の音声ファイルを選ぶ</label>
           <input id="audioFile" type="file" accept="audio/*">
           <p class="help">選択した音声ファイルはサーバーには送信されません。このブラウザ内でのみ処理されます。</p>
         </div>

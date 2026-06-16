@@ -313,3 +313,30 @@ button:disabled {
 .stop-button { margin-top: 10px; background: #5f6b7a; }
 .message-panel h2 { margin-bottom: 12px; }
 .scaleout-label { font: 800 11px system-ui, sans-serif; fill: #9b2c2c; paint-order: stroke; stroke: #ffffff; stroke-width: 3px; }
+
+
+.sample-card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  background: #fff;
+}
+
+.source-label {
+  margin: 0 0 10px;
+  font-weight: 700;
+}
+
+.sample-card .button-row {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .sample-card .button-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.sample-card .choice-button {
+  min-height: 96px;
+}

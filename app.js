@@ -76,7 +76,8 @@ const els = {
   audiogramSvg: document.getElementById("audiogramSvg"),
   clarity: document.getElementById("clarity"),
   clarityValue: document.getElementById("clarityValue"),
-  currentSettings: document.getElementById("currentSettings")
+  currentSettings: document.getElementById("currentSettings"),
+  sourceStatus: document.getElementById("sourceStatus")
 };
 
 let audioContext = null;
@@ -140,7 +141,7 @@ async function handleFile(event) {
   const arrayBuffer = await file.arrayBuffer();
   audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
-  enablePlayback();
+  enablePlayback(`音声ファイル「${file.name}」を読み込みました。`);
 }
 
 async function loadSampleTone() {
@@ -166,13 +167,18 @@ async function loadSampleTone() {
   }
 
   audioBuffer = buffer;
-  enablePlayback();
+  enablePlayback("サンプル音を読み込みました。");
 }
 
-function enablePlayback() {
+function enablePlayback(label = "音源の準備ができました。") {
   els.playOriginalBtn.disabled = false;
   els.playProcessedBtn.disabled = false;
   els.stopBtn.disabled = false;
+
+  if (els.sourceStatus) {
+    els.sourceStatus.textContent = label + " 「元の音を聞く」または「設定した聞こえ方で聞く」を押してください。";
+    els.sourceStatus.classList.add("ready");
+  }
 }
 
 function updateSliderLabels() {
@@ -228,10 +234,10 @@ function getAdjustedAudiogramPoints(basePoints, targetAverage) {
   const currentAverage = getFourFrequencyAverage(basePoints);
   const shift = targetAverage - currentAverage;
 
-  return basePoints.map(([freq, db]) => [
-    freq,
-    clampDb(db + shift)
-  ]);
+  return basePoints.map(([freq, db]) => {
+    const rawDb = db + shift;
+    return [freq, clampDb(rawDb), rawDb];
+  });
 }
 
 function clampDb(db) {
@@ -315,8 +321,13 @@ function drawAudiogram(type) {
   drawSpeechBananaOverlay(svg, xForFreq, yForDb);
   drawEverydaySoundOverlay(svg, xForFreq, yForDb, type);
 
-  for (const [f, db] of type.points) {
-    appendCircle(svg, xForFreq(f), yForDb(db), 6, "#355c7d");
+  for (const point of type.points) {
+    const [f, db, rawDb] = point;
+    const isScaleOut = Number.isFinite(rawDb) && rawDb > 120;
+    appendCircle(svg, xForFreq(f), yForDb(db), 6, isScaleOut ? "#9b2c2c" : "#355c7d");
+    if (isScaleOut) {
+      appendText(svg, xForFreq(f), yForDb(120) - 10, "120+", "middle", "scaleout-label");
+    }
   }
 }
 

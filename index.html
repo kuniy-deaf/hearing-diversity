@@ -10,143 +10,89 @@
 <body>
   <header class="site-header">
     <div>
-      <p class="eyebrow">Hearing Diversity Simulator</p>
+      <p class="eyebrow">Hearing Diversity</p>
       <h1>聞こえ方の違いを体験する</h1>
-      <p class="lead">
-        あなたが体験するのは、数ある聞こえ方のひとつです。
-        同じ難聴者でも、聞こえ方は一人ひとり異なります。
-      </p>
+      <p class="lead">あなたが体験するのは、数ある聞こえ方のひとつです。同じ難聴者でも、聞こえ方は一人ひとり異なります。</p>
     </div>
   </header>
 
   <main class="layout">
-    <section class="panel">
-      <h2>1. 音声を選ぶ</h2>
+    <section class="panel step-panel">
+      <div class="step-heading"><span class="step-number">STEP 1</span><h2>音源を選ぶ</h2></div>
+      <p class="section-lead">まずは、サンプル音を使うか、自分の音声ファイルを選んでください。</p>
 
-      <div class="field">
-        <label for="audioFile">音声ファイルを選択</label>
-        <input id="audioFile" type="file" accept="audio/*">
-        <p class="help">
-          選択した音声ファイルはサーバーには送信されません。このブラウザ内でのみ処理されます。
-        </p>
+      <div class="source-choice-grid">
+        <button id="loadSampleBtn" type="button" class="choice-button">
+          <span>サンプル音を使う</span>
+          <small>ファイルを用意せずに試せます</small>
+        </button>
+
+        <div class="upload-card">
+          <label for="audioFile">音声ファイルを選ぶ</label>
+          <input id="audioFile" type="file" accept="audio/*">
+          <p class="help">選択した音声ファイルはサーバーには送信されません。このブラウザ内でのみ処理されます。</p>
+        </div>
       </div>
 
-      <div class="button-row">
-        <button id="loadSampleBtn" type="button">サンプル音声を使う</button>
-        <button id="playOriginalBtn" type="button" disabled>元の音を再生</button>
-      </div>
+      <p id="sourceStatus" class="status-message" aria-live="polite">音源はまだ準備されていません。</p>
     </section>
 
-    <section class="panel">
-      <h2>2. 聞こえ方を設定する</h2>
+    <section class="panel step-panel">
+      <div class="step-heading"><span class="step-number">STEP 2</span><h2>聞こえ方を選ぶ</h2></div>
 
       <div class="field">
         <label for="audiogramType">オージオグラムタイプ</label>
         <select id="audiogramType"></select>
       </div>
 
-      <div class="audiogram-card">
-        <div class="audiogram-header">
-          <h3 id="typeName">-</h3>
-          <p id="typeSummary">タイプを選択してください。</p>
-        </div>
-
-        <svg id="audiogramSvg" viewBox="0 0 640 360" role="img" aria-labelledby="audiogramTitle audiogramDesc">
-          <title id="audiogramTitle">オージオグラム図</title>
-          <desc id="audiogramDesc">選択した聞こえ方のサンプル図です。</desc>
-        </svg>
-
-        <p id="typeDescription" class="description"></p>
-        <p class="speech-banana-note">
-          ※ スピーチバナナは英語音声を基準とした概念図です。実際の聞こえ方を再現するものではなく、イメージしやすいように簡略化しています。
-        </p>
-      </div>
-
       <fieldset class="field hearing-level-field">
         <legend>聴力レベル</legend>
-        <p class="help">
-          四分法平均（500Hz + 1000Hz×2 + 2000Hz）÷4 が、選んだ代表値に近づくようにグラフを調整します。
-        </p>
-
+        <p class="help">四分法平均（500Hz + 1000Hz×2 + 2000Hz）÷4 が、選んだ代表値に近づくようにグラフを調整します。</p>
         <div class="hearing-level-options">
-          <label class="radio-card">
-            <input type="radio" name="hearingLevel" value="normal">
-            <span>健聴</span>
-            <small>20dB相当</small>
-          </label>
-
-          <label class="radio-card">
-            <input type="radio" name="hearingLevel" value="mild">
-            <span>軽度難聴</span>
-            <small>35dB相当</small>
-          </label>
-
-          <label class="radio-card">
-            <input type="radio" name="hearingLevel" value="moderate" checked>
-            <span>中度難聴</span>
-            <small>55dB相当</small>
-          </label>
-
-          <label class="radio-card">
-            <input type="radio" name="hearingLevel" value="severe">
-            <span>高度難聴</span>
-            <small>80dB相当</small>
-          </label>
-
-          <label class="radio-card">
-            <input type="radio" name="hearingLevel" value="profound">
-            <span>重度難聴</span>
-            <small>110dB相当</small>
-          </label>
+          <label class="radio-card"><input type="radio" name="hearingLevel" value="normal"><span>健聴</span><small>20dB相当</small></label>
+          <label class="radio-card"><input type="radio" name="hearingLevel" value="mild"><span>軽度難聴</span><small>35dB相当</small></label>
+          <label class="radio-card"><input type="radio" name="hearingLevel" value="moderate" checked><span>中度難聴</span><small>55dB相当</small></label>
+          <label class="radio-card"><input type="radio" name="hearingLevel" value="severe"><span>高度難聴</span><small>80dB相当</small></label>
+          <label class="radio-card"><input type="radio" name="hearingLevel" value="profound"><span>重度難聴</span><small>110dB相当</small></label>
         </div>
       </fieldset>
 
       <div class="field">
-        <label for="clarity">
-          ことばの明瞭度 <span id="clarityValue">100</span>%
-        </label>
+        <label for="clarity">ことばの明瞭度 <span id="clarityValue">100</span>%</label>
         <input id="clarity" type="range" min="10" max="100" value="100">
-        <p class="help">
-          医学的な語音明瞭度そのものではなく、ことばの輪郭が失われる感じを疑似的に表します。
-        </p>
+        <p class="help">医学的な語音明瞭度そのものではなく、ことばの輪郭が失われる感じを疑似的に表します。</p>
       </div>
 
-      <div class="button-row">
-        <button id="playProcessedBtn" type="button" disabled>変化した音を再生</button>
-        <button id="stopBtn" type="button" disabled>停止</button>
+      <div class="audiogram-card">
+        <div class="audiogram-header"><h3 id="typeName">-</h3><p id="typeSummary">タイプを選択してください。</p></div>
+        <svg id="audiogramSvg" viewBox="0 0 640 360" role="img" aria-labelledby="audiogramTitle audiogramDesc">
+          <title id="audiogramTitle">オージオグラム図</title>
+          <desc id="audiogramDesc">選択した聞こえ方のサンプル図です。</desc>
+        </svg>
+        <p id="typeDescription" class="description"></p>
+        <p class="speech-banana-note">※ スピーチバナナは英語音声を基準とした概念図です。実際の聞こえ方を再現するものではなく、イメージしやすいように簡略化しています。</p>
+        <p class="speech-banana-note">※ グラフ上の <strong>120+</strong> は、120dBを超える可能性があることを示しています。</p>
       </div>
     </section>
 
-    <section class="panel">
-      <h2>3. 体験した設定</h2>
+    <section class="panel step-panel">
+      <div class="step-heading"><span class="step-number">STEP 3</span><h2>聞いてみる</h2></div>
       <div id="currentSettings" class="settings-box"></div>
-
-      <div class="notice">
-        <h3>この体験の目的</h3>
-        <p>
-          このアプリは、さまざまな聞こえ方を体験するためのサンプルです。
-          「聴力レベル」「オージオグラム」「ことばの明瞭度」が別の要素であり、
-          人によって聞こえ方が大きく違うことを知るための疑似体験です。
-        </p>
+      <div class="button-row playback-buttons">
+        <button id="playOriginalBtn" type="button" disabled>元の音を聞く</button>
+        <button id="playProcessedBtn" type="button" disabled>設定した聞こえ方で聞く</button>
       </div>
+      <button id="stopBtn" type="button" disabled class="stop-button">停止</button>
+    </section>
 
-      <div class="notice">
-        <h3>伝えたいこと</h3>
-        <p>
-          あなたが体験したのは、数ある聞こえ方のひとつです。
-          同じ難聴者でも、聞こえ方は一人ひとり異なります。
-          この体験が、さまざまな聞こえ方を知るきっかけになれば幸いです。
-        </p>
-      </div>
+    <section class="panel message-panel">
+      <h2>この体験について</h2>
+      <div class="notice"><h3>あなたが体験したのは、数ある聞こえ方のひとつです。</h3><p>同じ難聴者でも、聞こえ方は一人ひとり異なります。この体験が、さまざまな聞こえ方を知るきっかけになれば幸いです。</p></div>
+      <div class="notice"><h3>サンプルとしての体験です</h3><p>このアプリは、さまざまな聞こえ方を体験するためのサンプルです。実際の聞こえ方は、聴力レベル、オージオグラム、語音明瞭度、補聴器・人工内耳の有無、騒音環境、左右差などによって異なります。</p></div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <p>
-      Educational prototype. Audio processing runs locally in your browser.
-    </p>
-  </footer>
-
+  <footer class="site-footer"><p>Sample prototype. Audio processing runs locally in your browser.</p></footer>
   <script src="./app.js"></script>
 </body>
 </html>

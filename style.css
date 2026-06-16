@@ -295,3 +295,21 @@ button:disabled {
   border-color: var(--accent);
   background: var(--accent-soft);
 }
+
+.step-panel { scroll-margin-top: 20px; }
+.step-heading { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+.step-heading h2 { margin: 0; }
+.step-number { display: inline-flex; align-items: center; justify-content: center; min-width: 72px; padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.04em; }
+.section-lead { margin: 0 0 16px; color: var(--muted); }
+.source-choice-grid { display: grid; gap: 14px; }
+@media (min-width: 720px) { .source-choice-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); } }
+.choice-button { min-height: 120px; border-radius: 16px; text-align: left; padding: 18px; }
+.choice-button span { display: block; font-size: 1.15rem; }
+.choice-button small { display: block; margin-top: 6px; font-weight: 500; opacity: 0.9; }
+.upload-card { border: 1px solid var(--line); border-radius: 16px; padding: 16px; background: #fff; }
+.status-message { margin: 16px 0 0; padding: 12px 14px; border-radius: 12px; background: #f4f6f8; border: 1px solid var(--line); color: var(--muted); font-weight: 700; }
+.status-message.ready { background: var(--accent-soft); border-color: #c8d7e4; color: var(--accent); }
+.playback-buttons { margin-top: 16px; }
+.stop-button { margin-top: 10px; background: #5f6b7a; }
+.message-panel h2 { margin-bottom: 12px; }
+.scaleout-label { font: 800 11px system-ui, sans-serif; fill: #9b2c2c; paint-order: stroke; stroke: #ffffff; stroke-width: 3px; }
